@@ -5,47 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grocery Helper - Camera</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/scan.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Take a Photo of Your Receipt</h1>
+
+        <h1>Scan your receipt</h1>
 
         <!-- Video element to show the camera stream -->
-        <video id="video" autoplay></video>
-        <button id="snap">Take Photo</button>
+        <img id="video" class="center-alt" src="{{ url_for('video_feed') }}">
+        <img id="video-static" style="display: none" class="center-alt" src="">
+        <button id="snap" class="button circle"><div></div></button>
 
         <!-- Canvas to capture the photo -->
         <canvas id="canvas" style="display:none;"></canvas>
 
         <!-- Form to upload the photo -->
         <form id="uploadForm" action="/process-receipt" method="POST" enctype="multipart/form-data" style="display:none;">
+            <button type="submit" class="arrow">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="75 72 35 35" width="37px" height="63px" fill="var(--dusk)" aria-hidden="true">
+                    <path d="M83 66C91.3333 74.3333 99.6667 82.6667 108 91 99.6667 99.3333 91.3333 107.6667 83 116 81 113.3333 79 110.6667 77 108 82.6667 102.3333 88.3333 96.6667 88 91 88.3333 85.3333 82.6667 79.6667 77 74"></path>
+                </svg>
+            </button>
             <input type="hidden" id="imageData" name="imageData">
-            <button type="submit">Submit Photo</button>
         </form>
 
     </div>
 
     <script>
         const video = document.getElementById('video');
+        const videoStatic = document.getElementById("video-static");
         const canvas = document.getElementById('canvas');
         const snap = document.getElementById('snap');
         const uploadForm = document.getElementById('uploadForm');
         const imageDataInput = document.getElementById('imageData');
 
-        // Access the user's camera
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream;
-            })
-            .catch(err => {
-                console.log("Error accessing camera: " + err);
-            });
-
         // Capture the photo
         snap.addEventListener("click", () => {
             const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.width = video.getBoundingClientRect().width;
+            canvas.height = video.getBoundingClientRect().height;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             // Hide video and show canvas
@@ -58,6 +58,12 @@
 
             // Show the upload form
             uploadForm.style.display = 'block';
+
+            videoStatic.style.display = 'block';
+            video.style.display = 'none';
+            video.src = "";
+            videoStatic.src = "{{ url_for('video_feed_static') }}"
+
         });
     </script>
 </body>

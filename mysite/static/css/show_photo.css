@@ -1,0 +1,145 @@
+:root {                             /* Colors */
+    --light: #dae7de;
+    --light2: #bad4c7;
+    --semi-light: #f2fdef;
+    --semi-light2: #d8f8e6;
+    --semi-light3: #95ebcd;
+    --semi-light4: #74e3cc;
+    --lime: #d9ef81;
+    --lime2: #b5d43c;
+    --dark: #244a56;
+    --dark2: #25575e;
+    --dark3: #30626d;
+    --dusk: #263844;
+    --invis: transparent;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10%;
+}
+
+.receipt {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 40vw;
+}
+
+.receipt div {
+    height: 80vh;
+    object-fit: contain;
+}
+
+.receipt img {
+    height: 80vh;
+    object-fit:scale-down;
+    background-color: var(--lime);
+}
+
+.list {
+    width: 40vw;
+}
+
+#loading {
+    animation: loading 2s ease-in-out infinite;
+}
+@keyframes loading {
+    from,to {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+
+#ocrText {
+    height: 100%;
+}
+
+
+.item {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5%;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    transition: 1s;
+    transform: translateY(-5%) scale(90%);
+    opacity: 0;
+    margin: 2% 0; 
+    overflow: hidden;
+}
+
+.item p {
+    margin: 0;
+}
+
+.item div {
+    padding: 2%;
+}
+
+.item .name {
+    font-size: 1rem;
+}
+.item .shelf {
+    font-size: 0.75rem;
+}
+
+.item .price {
+    font-size: 1.5rem;
+}
+
+.item .text {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    text-align: start;
+    width: 90%;
+}
+
+.item .price {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.items {
+    height: 80vh;
+    overflow: scroll;
+}
+
+.color-flag {
+    position: absolute;
+    width: 10%;
+    height: 100%;
+    right: 0;
+    opacity: 0.2;
+    transform: scaleY(300%) rotate(40deg);
+}
+
+.color-dot {
+    font-size: 3rem;
+    transform: translateX(125%);
+}
+
+@media screen and (max-width: 800px) {
+    .container {
+        flex-direction: column;
+    }
+    .receipt {
+        max-width: 90vw;
+    }
+    .list {
+        width: 90vw;
+    }
+}

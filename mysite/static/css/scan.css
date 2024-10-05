@@ -1,0 +1,7 @@
+img {
+    max-width: 60vw;
+    max-height: 60vh;
+    /* width: 100%; */
+    /* object-fit: scale-down; */
+    /* height: auto; */
+}
