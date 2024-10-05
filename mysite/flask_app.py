@@ -21,7 +21,7 @@ def receipt_scan():
 import cv2
 import numpy as np
 
-def adjust_receipt_image(image, output_size=(800, 1000)):
+def adjust_receipt_image(image, output_size=(800, 1000), debug=False):
     # Convert to HSV color space to filter out non-white regions
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -41,7 +41,8 @@ def adjust_receipt_image(image, output_size=(800, 1000)):
     # Sort contours by area (largest should be the receipt)
     contours = sorted(contours, key=cv2.contourArea, reverse=True)
 
-    cv2.drawContours(image, contours, -1, (255, 255, 0), 2)
+    if debug:
+        cv2.drawContours(image, contours, -1, (255, 255, 0), 2)
 
     # Filter out non-rectangular contours
     rectangular_contours = []
@@ -53,7 +54,7 @@ def adjust_receipt_image(image, output_size=(800, 1000)):
         x, y, w, h = cv2.boundingRect(approx)
         aspect_ratio = float(w) / h
 
-        if i == 0:
+        if i == 0 and debug:
             image = cv2.putText(image, ("aspect ratio: " + str(aspect_ratio)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX,
                                 1, (0 if 0.6 < aspect_ratio < 1.4 else 255, 255, 0 if 0.6 < aspect_ratio < 1.4 else 255), 2, cv2.LINE_AA)
             image = cv2.putText(image, ("w: " + str(w)), (50, 150), cv2.FONT_HERSHEY_SIMPLEX,
@@ -70,12 +71,13 @@ def adjust_receipt_image(image, output_size=(800, 1000)):
             rectangular_contours.append(approx)
 
     # Draw rectangular contours for debugging
-    if len(rectangular_contours) > 0:
+    if len(rectangular_contours) > 0 and debug:
         cv2.drawContours(image, rectangular_contours, -1, (0, 255, 0), 5)  # Green color for rectangular contours
 
     # Ensure that we have at least one rectangular contour
     if not rectangular_contours:
-        image = cv2.putText(image, 'Cannot find rectangular contours', (50, 50), cv2.FONT_HERSHEY_SIMPLEX,
+        if debug:
+            image = cv2.putText(image, 'Cannot find rectangular contours', (50, 50), cv2.FONT_HERSHEY_SIMPLEX,
                             1, (255, 0, 0), 2, cv2.LINE_AA)
         return image
 
@@ -84,7 +86,8 @@ def adjust_receipt_image(image, output_size=(800, 1000)):
     # Assuming the largest rectangular contour is the receipt
     receipt_contour = rectangular_contours[0]
 
-    cv2.drawContours(image, [receipt_contour], -1, (0, 0, 255), 20)  # Green color for rectangular contours
+    if debug:
+        cv2.drawContours(image, [receipt_contour], -1, (0, 0, 255), 20)  # Green color for rectangular contours
 
     # Get the four points of the receipt
     # Get the bounding box of the contour (rectangular box around the contour)
@@ -126,10 +129,6 @@ def process_receipt():
     # Convert PIL image to OpenCV format (NumPy array)
     image_cv = np.array(image)
 
-    # Check if the image has an alpha channel (remove it if present)
-    if image_cv.shape[-1] == 4:
-        image_cv = cv2.cvtColor(image_cv, cv2.COLOR_RGBA2BGR)
-
     # Apply the adjustment (crop and warp the receipt)
     adjusted_image = adjust_receipt_image(image_cv)
 
@@ -161,10 +160,29 @@ def generate_frames():
 
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            
+def generate_frame():
+    camera = cv2.VideoCapture(0)
+    success, frame = camera.read()
+    if not success:
+        return
+    else:
+        # Apply any OpenCV filters or processing here
+        frame = adjust_receipt_image(frame)
+        # Convert processed frame to JPEG
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/video_feed')
 def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video_feed_static')
+def video_feed_static():
+    return Response(generate_frame(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
