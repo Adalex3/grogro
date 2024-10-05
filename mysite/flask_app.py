@@ -30,4 +30,4 @@ def upload_receipt():
     return render_template('show_photo.html', filename='uploaded_image.png', ocr_text=ocr_text)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,port=5001)
