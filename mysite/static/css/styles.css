@@ -64,6 +64,9 @@ body {
     left: 10%;
     top: 5%;
 }
+.nav a img {
+    width: 25%;
+}
 
 .test {
     display: block;

@@ -30,7 +30,7 @@
     justify-content: center;
     gap: 10%;
     height: 80vh !important;
-}
+}   
 
 .receipt {
     display: flex;
@@ -140,6 +140,30 @@
 .color-dot {
     font-size: 3rem;
     transform: translateX(125%);
+}
+
+#total-label {
+    width: 100%;
+    font-size: 1.3rem;
+    text-align: right;
+    font-family: Arial, Helvetica, sans-serif;
+    border-bottom: solid 2px rgba(0,0,0,0.2);
+    padding: 2%;
+    margin-bottom: 0 !important;
+    opacity: 0;
+    transition: 1s;
+    color: var(--dusk);
+}
+
+#date-label {
+    margin-top: 1% !important;
+    width: 100%;
+    font-size: 1rem;
+    text-align: left;
+    font-family: Arial, Helvetica, sans-serif;
+    opacity: 0;
+    transition: 1s;
+    color: var(--dusk);
 }
 
 @media screen and (max-width: 800px) {

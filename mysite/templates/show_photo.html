@@ -17,7 +17,7 @@
 
     <div class="nav">
         <img class="wave" src="../static/res/wave.svg">
-        <a href="/home">Snap.py</a>
+        <a href="/home"><img src="../static/res/title.png"></a>
     </div>
 
     <div class="container">
@@ -131,6 +131,11 @@
                     }
                     dateLabel.textContent = 'Transaction occured on: ' + date;
                     totalLabel.textContent = 'You spent $' + total;
+
+                    setTimeout(function(){
+                        dateLabel.style.opacity = 1;
+                        totalLabel.style.opacity = 1;
+                    },1000);
                 }
             })
             .catch(error => {
