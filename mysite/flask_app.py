@@ -19,45 +19,110 @@ def receipt_scan():
 
 
 import cv2
-import numpy as np
+from openai import OpenAI
+import json
 
+def extract_text(image_path):
+    # Open the image file and encode it as a base64 string
+    def encode_image(image_path):
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode("utf-8")
 
-# READING TEXT FROM IMAGE
-def preprocess_image(image):
-    # Convert to grayscale
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    base64_image = encode_image(image_path)
 
-    # Apply Gaussian blur to reduce noise
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    client = OpenAI(api_key='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')
 
-    # Apply adaptive thresholding to deal with lighting issues
-    thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                   cv2.THRESH_BINARY, 11, 2)
+    response = client.chat.completions.create(
+        model='gpt-4o',
+        messages=[
+            {"role": "system",
+             "content": """
+             You will receive an image of a receipt. First, extract the items listed on the receipt along with their corresponding prices. Then, provide an estimated shelf life for each item based on typical storage conditions.
 
-    # Optional: Rotate and deskew the image using Hough Line Transform
-    coords = np.column_stack(np.where(thresh > 0))
-    angle = cv2.minAreaRect(coords)[-1]
-    if angle < -45:
-        angle = -(90 + angle)
-    else:
-        angle = -angle
+# Steps
 
-    (h, w) = image.shape[:2]
-    M = cv2.getRotationMatrix2D((w // 2, h // 2), angle, 1.0)
-    rotated = cv2.warpAffine(thresh, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+1. **Receipt Analysis**: 
+   - Use OCR (Optical Character Recognition) to extract text from the receipt image.
+   - Identify and list all items purchased, along with their respective prices.
 
-    return rotated
+2. **Shelf Life Estimation**:
+   - For each identified item, estimate the typical time it will remain fresh based on general storage guidelines.
 
+3. **Data Output**:
+   - Present both the extracted item details and their estimated shelf life in a structured format.
 
-def extract_text(image):
-    # Preprocess the image
-    preprocessed_image = preprocess_image(image)
+# Output Format
 
-    # Extract text using Tesseract OCR
-    custom_config = r'--oem 3 --psm 6'  # OEM 3 is for best accuracy, PSM 6 assumes uniform block of text
-    extracted_text = pytesseract.image_to_string(preprocessed_image, config=custom_config)
+The output should be structured in JSON format as follows:
+- "items": a list of objects, each containing:
+  - "name": the name of the item.
+  - "price": the price of the item.
+  - "shelf_life": estimated shelf life in days.
 
-    return extracted_text
+```json
+{
+  "items": [
+    {
+      "name": "[Item Name]",
+      "price": "[Price]",
+      "shelf_life": "[Shelf Life in Days]"
+    },
+    {
+      "name": "[Item Name]",
+      "price": "[Price]",
+      "shelf_life": "[Shelf Life in Days]"
+    }
+    // More items as needed
+  ]
+}
+```
+
+# Examples
+
+**Example Input:**
+- Image of a grocery receipt.
+
+**Example Output:**
+```json
+{
+  "items": [
+    {
+      "name": "Bananas",
+      "price": "$2.99",
+      "shelf_life": "5"
+    },
+    {
+      "name": "Milk",
+      "price": "$1.50",
+      "shelf_life": "7"
+    }
+  ]
+}
+```
+
+# Notes
+
+- Consider variations in item names; use common names when possible.
+- Pay attention to store-specific receipt formats; some receipts may list item codes instead of names. Attempt to map item codes to common names if possible.
+- This system assumes typical room or refrigerated storage conditions when estimating shelf life. Adjust estimates if different storage conditions are provided.
+"""},
+            {"role": "user", "content": [
+                {"type": "text", "text": "Here is an image of a receipt."},
+                {"type": "image_url", "image_url": {
+                    "url": f"data:image/png;base64,{base64_image}"}
+                 }
+            ]}
+        ],
+        temperature=0.0,
+    )
+
+    response_text = response.choices[0].message.content.replace("```","").replace("json","")
+
+    try:
+        json_response = json.loads(response_text)  # Parse string as JSON
+        return json_response  # Return the JSON response
+    except json.JSONDecodeError:
+        return {"error": "Failed to parse the response as JSON. Response: " + str(response_text)}
 
 def adjust_receipt_image(image, debug=False):
     # Convert to HSV color space to filter out non-white regions
@@ -139,6 +204,7 @@ def adjust_receipt_image(image, debug=False):
 
     return centered  # Return the cropped and optionally resized image
 
+
 @app.route('/process-receipt', methods=['POST'])
 def process_receipt():
     # Get base64-encoded image data from form
@@ -161,11 +227,18 @@ def process_receipt():
     image_path = 'static/receipt.png'
     processed_image.save(image_path)
 
-    # Perform OCR on the processed image
-    ocr_text = extract_text(adjusted_image)
+    # Initially render show_photo.html with a loading state
+    return render_template('show_photo.html', filename='receipt.png')
 
-    # Render show_photo.html with OCR text and image
-    return render_template('show_photo.html', filename='receipt.png', ocr_text=ocr_text)
+
+@app.route('/get_ocr_data', methods=['POST'])
+def get_ocr_data():
+    image_path = 'static/receipt.png'
+
+    # Perform OCR on the processed image
+    ocr_text = extract_text(image_path)
+
+    return ocr_text
 
 def generate_frames():
     camera = cv2.VideoCapture(0)

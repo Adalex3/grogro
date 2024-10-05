@@ -3,15 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/show_photo.css') }}">
     <title>Uploaded Receipt</title>
+    <style>
+        #loading {
+            font-size: 20px;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-    <h1>Here is your uploaded receipt</h1>
-    <div>
-        <img src="{{ url_for('static', filename=filename) }}" alt="Uploaded Receipt" style="max-width: 100%; height: auto;">
+
+    <div class="container">
+        <div class="receipt">
+            <h1>Your Receipt</h1>
+            <img src="{{ url_for('static', filename=filename) }}" alt="Uploaded Receipt">
+        </div>
+        <div class="list">
+            <h1>Your Groceries</h1>
+            <div id="loading">Analyzing receipt...</div>
+            <p id="ocrText"></p>
+            <div class="items">
+                <div class="item" id="item-template" style="display: none">
+                    <div class="text">
+                        <p class="name">Grocery Name</p>
+                        <p class="shelf">Shelf Life</p>
+                    </div>
+                    <div class="price">
+                        <p class="price">Price</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <h2>Extracted Text:</h2>
-    <p>{{ ocr_text }}</p>
+    <script>
+
+        const itemTemplate = document.getElementById("item-template");
+        const itemsDiv = document.querySelector(".items");
+
+        // Fetch OCR data after the page loads
+        window.onload = function() {
+            fetch('/get_ocr_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+
+                // Process and display the extracted OCR data
+                const ocrTextElement = document.getElementById('ocrText');
+                if (data.error) {
+                    ocrTextElement.innerHTML = "Error: " + data.error;
+                } else {
+                    // Format the extracted items
+                    data.items.forEach(item => {
+                            const newItem = itemTemplate.cloneNode(true);
+
+                            newItem.querySelector(".name").textContent = item.name;
+                            if(item.shelf_life != 'N/A') {
+                                newItem.querySelector(".shelf").textContent = `Shelf Life: ${item.shelf_life}`;
+                            } else {
+                                newItem.querySelector(".shelf").remove();
+                            }
+                            newItem.querySelector(".price").textContent = `${item.price}`;
+
+                            itemsDiv.appendChild(newItem);
+                            newItem.style.display = "flex";
+                            newItem.style.opacity = 1;
+                        
+                    });
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading').innerHTML = "Failed to load OCR data. Error: " + error;
+            });
+        };
+    </script>
+
 </body>
 </html>
