@@ -26,7 +26,7 @@ def adjust_receipt_image(image, output_size=(800, 1000)):
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     # Define a mask for white regions (low saturation, high value)
-    lower_white = np.array([0, 0, 100])  # Adjust the range based on lighting conditions
+    lower_white = np.array([0, 0, 150])  # Adjust the range based on lighting conditions
     upper_white = np.array([180, 50, 255])
 
     # Apply the mask to extract white areas (likely the paper)
@@ -45,17 +45,33 @@ def adjust_receipt_image(image, output_size=(800, 1000)):
 
     # Filter out non-rectangular contours
     rectangular_contours = []
+    i = 0
     for contour in contours:
         epsilon = 0.02 * cv2.arcLength(contour, True)
         approx = cv2.approxPolyDP(contour, epsilon, True)
 
         x, y, w, h = cv2.boundingRect(approx)
         aspect_ratio = float(w) / h
-        if 0.6 < aspect_ratio < 1.4 and 3 < len(approx) < 6 and w > (image.size.width * 0.01):  # Check for square-like or rectangular contours
+
+        if i == 0:
+            image = cv2.putText(image, ("aspect ratio: " + str(aspect_ratio)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX,
+                                1, (0 if 0.6 < aspect_ratio < 1.4 else 255, 255, 0 if 0.6 < aspect_ratio < 1.4 else 255), 2, cv2.LINE_AA)
+            image = cv2.putText(image, ("w: " + str(w)), (50, 150), cv2.FONT_HERSHEY_SIMPLEX,
+                                1, (0 if w > image.shape[1]*0.3 else 255, 255, 0 if w > image.shape[1]*0.3 else 255), 2, cv2.LINE_AA)
+            image = cv2.putText(image, ("img-width x 0.4: " + str(image.shape[1]*0.4)), (50, 200), cv2.FONT_HERSHEY_SIMPLEX,
+                                1, (255, 255, 255), 2, cv2.LINE_AA)
+        i += 1
+
+        if 0.6 < aspect_ratio < 1.4 and w > image.shape[1]*0.3:  # Check for square-like or rectangular contours
+            # Get the area of the contour
+            area = cv2.contourArea(contour)
+
+            # if area > w*h*0.5:
             rectangular_contours.append(approx)
 
     # Draw rectangular contours for debugging
-    cv2.drawContours(image, rectangular_contours, -1, (0, 255, 0), 5)  # Green color for rectangular contours
+    if len(rectangular_contours) > 0:
+        cv2.drawContours(image, rectangular_contours, -1, (0, 255, 0), 5)  # Green color for rectangular contours
 
     # Ensure that we have at least one rectangular contour
     if not rectangular_contours:
@@ -71,7 +87,16 @@ def adjust_receipt_image(image, output_size=(800, 1000)):
     cv2.drawContours(image, [receipt_contour], -1, (0, 0, 255), 20)  # Green color for rectangular contours
 
     # Get the four points of the receipt
-    points = receipt_contour.reshape(4, 2)
+    # Get the bounding box of the contour (rectangular box around the contour)
+    x, y, w, h = cv2.boundingRect(receipt_contour)
+
+    # Define the four points of the bounding box
+    points = np.array([
+        [x, y],
+        [x + w, y],
+        [x + w, y + h],
+        [x, y + h]
+    ], dtype="float32")
 
     # Specify the points for the destination (a straightened rectangle)
     dst_points = np.array([
@@ -82,7 +107,7 @@ def adjust_receipt_image(image, output_size=(800, 1000)):
     ], dtype="float32")
 
     # Get the perspective transform matrix
-    matrix = cv2.getPerspectiveTransform(points.astype("float32"), dst_points)
+    matrix = cv2.getPerspectiveTransform(points, dst_points)
 
     # Warp the image using the perspective transform
     warped = cv2.warpPerspective(image, matrix, output_size)
