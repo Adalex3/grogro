@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Helper - Camera</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Take a Photo of Your Receipt</h1>
+
+        <!-- Video element to show the camera stream -->
+        <video id="video" width="100%" autoplay></video>
+        <button id="snap">Take Photo</button>
+
+        <!-- Canvas to capture the photo -->
+        <canvas id="canvas" style="display:none;"></canvas>
+
+        <!-- Form to upload the photo -->
+        <form id="uploadForm" action="/upload-receipt" method="POST" enctype="multipart/form-data" style="display:none;">
+            <input type="hidden" id="imageData" name="imageData">
+            <button type="submit">Submit Photo</button>
+        </form>
+
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const snap = document.getElementById('snap');
+        const uploadForm = document.getElementById('uploadForm');
+        const imageDataInput = document.getElementById('imageData');
+
+        // Access the user's camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.log("Error accessing camera: " + err);
+            });
+
+        // Capture the photo
+        snap.addEventListener("click", () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Hide video and show canvas
+            video.style.display = 'none';
+            canvas.style.display = 'block';
+
+            // Convert the photo to a base64 string
+            const imageData = canvas.toDataURL('image/png');
+            imageDataInput.value = imageData;
+
+            // Show the upload form
+            uploadForm.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
