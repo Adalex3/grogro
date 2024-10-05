@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, request, Response
 from PIL import Image
+import easyocr
 import pytesseract
 from io import BytesIO
 import base64
@@ -20,6 +21,44 @@ def receipt_scan():
 
 import cv2
 import numpy as np
+
+
+# READING TEXT FROM IMAGE
+def preprocess_image(image):
+    # Convert to grayscale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # Apply Gaussian blur to reduce noise
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
+    # Apply adaptive thresholding to deal with lighting issues
+    thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                   cv2.THRESH_BINARY, 11, 2)
+
+    # Optional: Rotate and deskew the image using Hough Line Transform
+    coords = np.column_stack(np.where(thresh > 0))
+    angle = cv2.minAreaRect(coords)[-1]
+    if angle < -45:
+        angle = -(90 + angle)
+    else:
+        angle = -angle
+
+    (h, w) = image.shape[:2]
+    M = cv2.getRotationMatrix2D((w // 2, h // 2), angle, 1.0)
+    rotated = cv2.warpAffine(thresh, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+
+    return rotated
+
+
+def extract_text(image):
+    # Preprocess the image
+    preprocessed_image = preprocess_image(image)
+
+    # Extract text using Tesseract OCR
+    custom_config = r'--oem 3 --psm 6'  # OEM 3 is for best accuracy, PSM 6 assumes uniform block of text
+    extracted_text = pytesseract.image_to_string(preprocessed_image, config=custom_config)
+
+    return extracted_text
 
 def adjust_receipt_image(image, debug=False):
     # Convert to HSV color space to filter out non-white regions
@@ -117,14 +156,14 @@ def process_receipt():
     adjusted_image = adjust_receipt_image(image_cv)
 
     # Convert the processed OpenCV image back to PIL format
-    processed_image = Image.fromarray(image_cv)
+    processed_image = Image.fromarray(adjusted_image)
 
     # Save the image temporarily for display in show_photo.html
     image_path = 'static/receipt.png'
     processed_image.save(image_path)
 
     # Perform OCR on the processed image
-    ocr_text = pytesseract.image_to_string(processed_image)
+    ocr_text = extract_text(adjusted_image)
 
     # Render show_photo.html with OCR text and image
     return render_template('show_photo.html', filename='receipt.png', ocr_text=ocr_text)
