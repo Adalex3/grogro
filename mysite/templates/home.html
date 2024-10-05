@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Helper - Camera</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!--- Hidden redirect forms -->
+        <form id="redirectScan" action="/redirect_scan" method="GET" style="display:none;"></form>
+        <form id="redirectList" action="/redirect_list" method="GET" style="display:none;"></form>
+
+        <img class="center-alt" src="../static/res/title.png" alt="Title Image" style="width: calc(min(800px, 64%)); height: auto; top: 20vh;">
+
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10vh; margin-top: 40vh;">
+
+            <button onclick="redirectToList()" class="hyper_button" onmouseover="this.style.transform='scale(1.04)'; this.style.backgroundColor='var(--dusk)'; this.style.color='var(--lime3)'" onmouseout="this.style.transform='scale(1)'; this.style.backgroundColor='var(--invis)'; this.style.color='var(--dusk)'">
+                Scan Receipt
+            </button>
+    
+            <button onclick="redirectToList()" class="hyper_button" onmouseover="this.style.transform='scale(1.04)'; this.style.backgroundColor='var(--dusk)'; this.style.color='var(--lime3)'" onmouseout="this.style.transform='scale(1)'; this.style.backgroundColor='var(--invis)'; this.style.color='var(--dusk)'">
+                Shopping List
+            </button>
+
+
+            <div style="display: flex; flex-direction: column; position: relative; scale: 1.5;">
+                <div id="loading">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+                <svg width="80" height="80" xmlns="http://www.w3.org/2000/svg" viewBox="50 50 100 50" style="position: absolute; top: -20px">
+                    <path d="M93 78C71 78 53 67 67 67 88 67 99 67 121 67 135 67 115 78 93 78" fill="var(--dusk)"/>
+                </svg>
+            </div>
+
+        </div>
+          
+
+    </div>
+
+    <script>
+        function redirectToScan() {
+            document.getElementById('redirectScan').submit();
+        }
+        function redirectToList() {
+            document.getElementById('redirectList').submit();
+        }
+    </script>
+</body>
+</html>

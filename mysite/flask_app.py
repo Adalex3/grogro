@@ -10,8 +10,16 @@ import numpy as np
 app = Flask(__name__)
 
 @app.route('/')
-def index():
+def home():
+    return render_template('home.html')
+
+@app.route('/redirect_scan')
+def redirect_scan():
     return render_template('index.html')
+
+@app.route('/redirect_list')
+def redirect_list():
+    return render_template('home.html')
 
 @app.route('/receipt_scan')
 def receipt_scan():
