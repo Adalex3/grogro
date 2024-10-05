@@ -21,7 +21,7 @@ def receipt_scan():
 import cv2
 import numpy as np
 
-def adjust_receipt_image(image, output_size=(800, 1000), debug=False):
+def adjust_receipt_image(image, debug=False):
     # Convert to HSV color space to filter out non-white regions
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -93,29 +93,13 @@ def adjust_receipt_image(image, output_size=(800, 1000), debug=False):
     # Get the bounding box of the contour (rectangular box around the contour)
     x, y, w, h = cv2.boundingRect(receipt_contour)
 
-    # Define the four points of the bounding box
-    points = np.array([
-        [x, y],
-        [x + w, y],
-        [x + w, y + h],
-        [x, y + h]
-    ], dtype="float32")
+    # Instead of perspective warp, we simply crop the image using the bounding box
+    cropped = image[y:y + h, x:x + w]
 
-    # Specify the points for the destination (a straightened rectangle)
-    dst_points = np.array([
-        [0, 0],
-        [output_size[0] - 1, 0],
-        [output_size[0] - 1, output_size[1] - 1],
-        [0, output_size[1] - 1]
-    ], dtype="float32")
+    # Optionally, you can resize the cropped image to a fixed size if desired
+    centered = cv2.resize(cropped, (w,h))  # Resize to a standard dimension (optional)
 
-    # Get the perspective transform matrix
-    matrix = cv2.getPerspectiveTransform(points, dst_points)
-
-    # Warp the image using the perspective transform
-    warped = cv2.warpPerspective(image, matrix, output_size)
-
-    return warped
+    return centered  # Return the cropped and optionally resized image
 
 @app.route('/process-receipt', methods=['POST'])
 def process_receipt():
