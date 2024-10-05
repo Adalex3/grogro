@@ -10,8 +10,16 @@ import numpy as np
 app = Flask(__name__)
 
 @app.route('/')
-def index():
+def home():
+    return render_template('home.html')
+
+@app.route('/redirect_scan')
+def redirect_scan():
     return render_template('index.html')
+
+@app.route('/redirect_list')
+def redirect_list():
+    return render_template('home.html')
 
 @app.route('/receipt_scan')
 def receipt_scan():
@@ -30,7 +38,7 @@ def extract_text(image_path):
 
     base64_image = encode_image(image_path)
 
-    client = OpenAI(api_key='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')
+    client = OpenAI(api_key='goodbye')
 
     response = client.chat.completions.create(
         model='gpt-4o',
@@ -122,6 +130,7 @@ The output should be structured in JSON format as follows:
 - Pay attention to store-specific receipt formats; some receipts may list item codes instead of names. Attempt to map item codes to common names if possible.
 - This system assumes typical room or refrigerated storage conditions when estimating shelf life. Adjust estimates if different storage conditions are provided.
 - You may want to access the internet and search for any acronyms or shorthand names that come across as unclear.
+- For instance, "RED GRAPE" should be "Bunch of Red Grapes", "RED BELL" should be "Red Bell Peppers", "CINN ROLLS" should be "Cinnamon Rolls" and anything similar.
 - If an identified item has no easily identifiable color, choose the best fit color.
 - Usually, the transaction date/time will be at the bottom of the receipt in the format "MM/DD/YY HH:MM:SS".
 """},

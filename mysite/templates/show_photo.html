@@ -15,10 +15,15 @@
 </head>
 <body>
 
+    <div class="nav">
+        <img class="wave" src="../static/res/wave.svg">
+        <a href="/home">Snap.py</a>
+    </div>
+
     <div class="container">
         <div class="receipt">
-            <h1>Your Receipt</h1>
             <img src="{{ url_for('static', filename=filename) }}" alt="Uploaded Receipt">
+            <p id="uploaded">Uploaded at </p>
         </div>
         <div class="list">
             <h1>Your Groceries</h1>
@@ -37,11 +42,15 @@
                     <div class="color-flag"></div>
                 </div>
             </div>
+            <p id="total-label"></p>
             <p id="date-label"></p>
         </div>
     </div>
 
     <script>
+
+        date = (() => { const now = new Date(); let hours = now.getHours(); return `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear().toString().slice(-2)} at ${hours % 12 || 12}:${now.getMinutes().toString().padStart(2, '0')}${hours >= 12 ? 'PM' : 'AM'}`; })();
+        document.getElementById("uploaded").textContent = "Uploaded on " + date;
 
         function hexToLuminance(hex) {
             // Remove the # if present
@@ -60,11 +69,12 @@
 
         const itemTemplate = document.getElementById("item-template");
         const itemsDiv = document.querySelector(".items");
-        const dateLabel = document.getElementById("date-label")
+        const dateLabel = document.getElementById("date-label");
+        const totalLabel = document.getElementById("total-label");
 
         // Fetch OCR data after the page loads
         window.onload = function() {
-            fetch('/get_ocr_datafdjkflajsfdslfslkjf', {
+            fetch('/get_ocr_data', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -81,6 +91,7 @@
                 } else {
                     // Format the extracted items
                     var i = 0;
+                    var total = 0;
                     data.items.forEach(item => {
                             const newItem = itemTemplate.cloneNode(true);
 
@@ -110,6 +121,8 @@
                                 newItem.style.transform = 'none';
                             },50+i*75);
                             i++;
+
+                            total += parseFloat(item.price.replace("$",""));
                         
                     });
                     date = (() => { const now = new Date(); let hours = now.getHours(); return `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear().toString().slice(-2)} ${hours % 12 || 12}:${now.getMinutes().toString().padStart(2, '0')}${hours >= 12 ? 'PM' : 'AM'}`; })();
@@ -117,6 +130,7 @@
                         date = date
                     }
                     dateLabel.textContent = 'Transaction occured on: ' + date;
+                    totalLabel.textContent = 'You spent $' + total;
                 }
             })
             .catch(error => {

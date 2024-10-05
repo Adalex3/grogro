@@ -5,8 +5,12 @@
     --semi-light2: #d8f8e6;
     --semi-light3: #95ebcd;
     --semi-light4: #74e3cc;
-    --lime: #d9ef81;
-    --lime2: #b5d43c;
+    --lime: #c1ef81;
+    --lime2: #a5db4f;
+    --lime3: #90c43c;
+    --lime4: #c8ead1;
+    --lime5: #a8e0b7;
+    --lime6: #73c088;
     --dark: #244a56;
     --dark2: #25575e;
     --dark3: #30626d;
@@ -15,8 +19,17 @@
 }
 
 html {
-    background-image: linear-gradient(3deg, var(--lime2) 40%, var(--lime) 40%);
+    background-image: url('../res/bg.png');
+    background-color: var(--lime3);
+    background-size: cover;
+    background-position: center; 
+    background-repeat: no-repeat;
+    height: 100vh;
     height: 100%;
+}
+
+body {
+    margin: 0;
 }
 
 h1 {
@@ -24,6 +37,32 @@ h1 {
     text-align: center;
     color: var(--dusk);
     z-index: 1;
+}
+
+body {
+    margin: 0;
+}
+
+.nav {
+    width: 100%;
+    height: 20vh;
+}
+.nav .wave {
+    width: 100%;
+    height: 10vh;
+    object-fit: cover;
+    overflow: visible;
+    transform: translateY(0%) scaleY(50%);
+    z-index: 1;
+}
+
+.nav a {
+    font-size: 4rem;
+    font-weight: 900;
+    position: absolute;
+    z-index: 1000;
+    left: 10%;
+    top: 5%;
 }
 
 .test {
@@ -74,7 +113,26 @@ h1 {
     background: transparent;
 }
 
+.hyper_button {
+    width: 30%;
+    scale: 2;
+    background-color: var(--invis);
+    border: 3px solid var(--dusk);
+    color: var(--dusk);
+    font-weight: bold;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    transition: transform 0.4s;
+}
+
+
 @media screen and (max-width: 767px) {
+
     #video, #canvas {
         width: 85vw;
         height: auto;
@@ -84,4 +142,51 @@ h1 {
     .arrow {
         left: 63%;
     }
+}
+
+@media screen and (max-width: 640px) {
+    .hyper_button {
+        margin: 4px 0;
+        padding: 15px 0;
+        width: calc(max(30%, 150px));
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .hyper_button {
+        width: 100px;
+    }
+}
+
+#loading {
+    display: flex;
+    margin-left: 10px;
+}
+#loading div {
+    width: 11px;
+    height: 11px;
+    margin: 0 3px;
+    background-color: var(--dusk);
+    border-radius: 50%;
+    animation: bounce 1.5s infinite;
+}
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-9px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+#loading div:nth-child(1) {
+    animation: bounce 1.5s infinite;
+}
+#loading div:nth-child(2) {
+    animation: bounce 1.5s infinite 0.1s; /* 0.2s delay */
+}
+#loading div:nth-child(3) {
+    animation: bounce 1.5s infinite 0.2s; /* 0.4s delay */
 }

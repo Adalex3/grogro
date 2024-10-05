@@ -14,12 +14,22 @@
     --invis: transparent;
 }
 
+#uploaded {
+    color: #707070;
+    font-size: 0.7rem;
+    width: 100%;
+    text-align: left;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 .container {
+    overflow: hidden;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     gap: 10%;
+    height: 80vh !important;
 }
 
 .receipt {
@@ -31,12 +41,12 @@
 }
 
 .receipt div {
-    height: 80vh;
+    height: 60vh;
     object-fit: contain;
 }
 
 .receipt img {
-    height: 80vh;
+    height: 60vh;
     object-fit:scale-down;
     background-color: var(--lime);
 }
@@ -114,7 +124,7 @@
 }
 
 .items {
-    height: 80vh;
+    height: 50vh;
     overflow: scroll;
 }
 
