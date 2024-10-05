@@ -1,7 +1,6 @@
 import os
 from flask import Flask, render_template, request, Response
 from PIL import Image
-import easyocr
 import pytesseract
 from io import BytesIO
 import base64
