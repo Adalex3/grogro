@@ -11,7 +11,7 @@
         <h1>Take a Photo of Your Receipt</h1>
 
         <!-- Video element to show the camera stream -->
-        <video id="video" autoplay></video>
+        <img id="video" src="{{ url_for('video_feed') }}">
         <button id="snap">Take Photo</button>
 
         <!-- Canvas to capture the photo -->
@@ -32,20 +32,11 @@
         const uploadForm = document.getElementById('uploadForm');
         const imageDataInput = document.getElementById('imageData');
 
-        // Access the user's camera
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream;
-            })
-            .catch(err => {
-                console.log("Error accessing camera: " + err);
-            });
-
         // Capture the photo
         snap.addEventListener("click", () => {
             const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.width = video.width;
+            canvas.height = video.height;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             // Hide video and show canvas
