@@ -7,55 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-
-        <h1>Scan your receipt</h1>
-        
-        <!-- Video element to show the camera stream -->
-        <img id="video" class="center-alt" src="{{ url_for('video_feed') }}">
-        <button id="snap" class="button circle"><div></div></button>
-
-        <!-- Canvas to capture the photo -->
-        <canvas id="canvas" style="display:none;"></canvas>
-
-        <!-- Form to upload the photo -->
-        <form id="uploadForm" action="/upload-receipt" method="POST" enctype="multipart/form-data" style="display:none;">
-            <button type="submit" class="arrow">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="75 72 35 35" width="37px" height="63px" fill="var(--dusk)" aria-hidden="true">
-                    <path d="M83 66C91.3333 74.3333 99.6667 82.6667 108 91 99.6667 99.3333 91.3333 107.6667 83 116 81 113.3333 79 110.6667 77 108 82.6667 102.3333 88.3333 96.6667 88 91 88.3333 85.3333 82.6667 79.6667 77 74"></path>
-                </svg>
-            </button>
-            <input type="hidden" id="imageData" name="imageData">
-        </form>
-
-    </div>
-
-    <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const snap = document.getElementById('snap');
-        const uploadForm = document.getElementById('uploadForm');
-        const imageDataInput = document.getElementById('imageData');
-
-        // Capture the photo
-        snap.addEventListener("click", () => {
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // Hide video and show canvas
-            video.style.display = 'none';
-            canvas.style.display = 'block';
-
-            // Convert the photo to a base64 string
-            const imageData = canvas.toDataURL('image/png');
-            imageDataInput.value = imageData;
-
-            // Show the upload form
-            uploadForm.style.display = 'block';
-        });
-    </script>
+<body style="display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 10vw">
+    <h1>SNAP.PY</h1>
 </body>
 </html>
