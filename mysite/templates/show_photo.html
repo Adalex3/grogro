@@ -26,6 +26,7 @@
             <p id="ocrText"></p>
             <div class="items">
                 <div class="item" id="item-template" style="display: none">
+                    <p class="color-dot">•</p>
                     <div class="text">
                         <p class="name">Grocery Name</p>
                         <p class="shelf">Shelf Life</p>
@@ -33,19 +34,37 @@
                     <div class="price">
                         <p class="price">Price</p>
                     </div>
+                    <div class="color-flag"></div>
                 </div>
             </div>
+            <p id="date-label"></p>
         </div>
     </div>
 
     <script>
 
+        function hexToLuminance(hex) {
+            // Remove the # if present
+            hex = hex.replace('#', '');
+            
+            // Parse the R, G, B components
+            let r = parseInt(hex.substring(0, 2), 16);
+            let g = parseInt(hex.substring(2, 4), 16);
+            let b = parseInt(hex.substring(4, 6), 16);
+
+            // Calculate perceived luminance using your formula
+            let Y = (r + r + b + g + g + g) / 6;
+
+            return Y;
+        }
+
         const itemTemplate = document.getElementById("item-template");
         const itemsDiv = document.querySelector(".items");
+        const dateLabel = document.getElementById("date-label")
 
         // Fetch OCR data after the page loads
         window.onload = function() {
-            fetch('/get_ocr_data', {
+            fetch('/get_ocr_datafdjkflajsfdslfslkjf', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -61,22 +80,43 @@
                     ocrTextElement.innerHTML = "Error: " + data.error;
                 } else {
                     // Format the extracted items
+                    var i = 0;
                     data.items.forEach(item => {
                             const newItem = itemTemplate.cloneNode(true);
 
                             newItem.querySelector(".name").textContent = item.name;
                             if(item.shelf_life != 'N/A') {
-                                newItem.querySelector(".shelf").textContent = `Shelf Life: ${item.shelf_life}`;
+                                newItem.querySelector(".shelf").textContent = `Shelf Life: ${item.shelf_life} days`;
                             } else {
                                 newItem.querySelector(".shelf").remove();
                             }
                             newItem.querySelector(".price").textContent = `${item.price}`;
 
+                            newItem.querySelector(".color-flag").style.backgroundColor = item.color;
+                            newItem.querySelector(".color-dot").style.color = item.color;
+
+                            // Adjust shadow on dot & opacity depending on luminance
+                            const y = hexToLuminance(item.color);
+                            newItem.querySelector(".color-dot").style.filter = 'brightness(' + (0.25*((255-y)/255)+0.75) + ')';
+                            newItem.querySelector(".color-flag").style.opacity = 0.2 + (y/255/5);
+
+                            console.log(item.name + ": " + item.color);
+
                             itemsDiv.appendChild(newItem);
                             newItem.style.display = "flex";
-                            newItem.style.opacity = 1;
+
+                            setTimeout(function(){
+                                newItem.style.opacity = 1;
+                                newItem.style.transform = 'none';
+                            },50+i*75);
+                            i++;
                         
                     });
+                    date = (() => { const now = new Date(); let hours = now.getHours(); return `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear().toString().slice(-2)} ${hours % 12 || 12}:${now.getMinutes().toString().padStart(2, '0')}${hours >= 12 ? 'PM' : 'AM'}`; })();
+                    if (data.date != "N/A") {
+                        date = date
+                    }
+                    dateLabel.textContent = 'Transaction occured on: ' + date;
                 }
             })
             .catch(error => {

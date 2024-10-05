@@ -30,7 +30,7 @@ def extract_text(image_path):
 
     base64_image = encode_image(image_path)
 
-    client = OpenAI(api_key='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')
+    client = OpenAI(api_key='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')
 
     response = client.chat.completions.create(
         model='gpt-4o',
@@ -44,12 +44,20 @@ def extract_text(image_path):
 1. **Receipt Analysis**: 
    - Use OCR (Optical Character Recognition) to extract text from the receipt image.
    - Identify and list all items purchased, along with their respective prices.
+   - If there is an item whose name is shorthand, unintelligable, or an acronym for a longer title, make the most accurate guess as to what the name of the item is
 
 2. **Shelf Life Estimation**:
    - For each identified item, estimate the typical time it will remain fresh based on general storage guidelines.
+   
+3. **Color Identification**
+   - For each identified item, estimate what color may be associated with that item commonly in hex.
+   
+4. **Receipt Date Detection**:
+   - Identify the date and time that the transaction occured on the receipt image.
+   - If there is no date or time present, include the date in the output as "N/A"
 
-3. **Data Output**:
-   - Present both the extracted item details and their estimated shelf life in a structured format.
+5. **Data Output**:
+   - Present both the extracted item details, their estimated shelf life, and the transaction date in a structured format.
 
 # Output Format
 
@@ -58,6 +66,8 @@ The output should be structured in JSON format as follows:
   - "name": the name of the item.
   - "price": the price of the item.
   - "shelf_life": estimated shelf life in days.
+  - "color": color that the item is commonly associated with (in hex format)
+- "date": the date of the transaction.
 
 ```json
 {
@@ -65,15 +75,18 @@ The output should be structured in JSON format as follows:
     {
       "name": "[Item Name]",
       "price": "[Price]",
-      "shelf_life": "[Shelf Life in Days]"
+      "shelf_life": "[Shelf Life in Days]".
+      "color": "[Item Color]"
     },
     {
       "name": "[Item Name]",
       "price": "[Price]",
-      "shelf_life": "[Shelf Life in Days]"
+      "shelf_life": "[Shelf Life in Days]",
+      "color": "[Item Color]"
     }
     // More items as needed
-  ]
+  ],
+  "date": "[Transaction Date]"
 }
 ```
 
@@ -89,14 +102,17 @@ The output should be structured in JSON format as follows:
     {
       "name": "Bananas",
       "price": "$2.99",
-      "shelf_life": "5"
+      "shelf_life": "5",
+      "color": "#FFFF00"
     },
     {
       "name": "Milk",
       "price": "$1.50",
       "shelf_life": "7"
+      "color": "#FFFFFF"
     }
-  ]
+  ],
+  "date": "10/3/24 at 4:50PM"
 }
 ```
 
@@ -105,6 +121,9 @@ The output should be structured in JSON format as follows:
 - Consider variations in item names; use common names when possible.
 - Pay attention to store-specific receipt formats; some receipts may list item codes instead of names. Attempt to map item codes to common names if possible.
 - This system assumes typical room or refrigerated storage conditions when estimating shelf life. Adjust estimates if different storage conditions are provided.
+- You may want to access the internet and search for any acronyms or shorthand names that come across as unclear.
+- If an identified item has no easily identifiable color, choose the best fit color.
+- Usually, the transaction date/time will be at the bottom of the receipt in the format "MM/DD/YY HH:MM:SS".
 """},
             {"role": "user", "content": [
                 {"type": "text", "text": "Here is an image of a receipt."},
