@@ -25,6 +25,10 @@ def redirect_list():
 def receipt_scan():
     return render_template('receipt_scan.html')
 
+@app.route('/backend_tmp')
+def backend_tmp():
+    return render_template('backend_stuff/index.html')
+
 
 import cv2
 from openai import OpenAI
