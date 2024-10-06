@@ -22,7 +22,7 @@
                 <a class="back-button" href="/receipt_scan"><div><img src="https://img.icons8.com/quill/100/reply-arrow.png" alt="reply-arrow"/></div></a>
             </div>
             <div class="spacer"></div>
-            <img src="{{ url_for('static', filename=filename) }}" alt="Uploaded Receipt">
+            <img id="uploaded-img" src="{{ url_for('static', filename=filename) }}" alt="Uploaded Receipt">
             <p id="uploaded">Uploaded at </p>
         </div>
         <div class="list">
