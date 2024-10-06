@@ -92,10 +92,13 @@ style.textContent = `
 .notification h4 {
     margin: 0;
     font-size: 1rem;
+    margin-right: 50px;
 }
 
 .notification p:not(.bullet-point) {
     margin: 0;
+    font-size: 0.8rem;
+    margin-right: 50px;
 }
 
 .notification-section h3 {
@@ -104,6 +107,7 @@ style.textContent = `
     font-size: 1.2rem;
     border-bottom: 1px solid #ccc;
     padding-bottom: 5px;
+    margin-right: 50px;
 }
 
 .notification-section {
@@ -328,7 +332,7 @@ function addNotificationElement(notification, container, isFuture) {
         // Countdown for future notifications
         const timeRemaining = getTimeRemaining(notification.date);
         const countdown = document.createElement('p');
-        countdown.textContent = `${timeRemaining} until ${notification.title}`;
+        countdown.textContent = `${timeRemaining} until expiration`;
         countdown.classList.add('countdown');
         contentDiv.appendChild(countdown);
     } else {
@@ -348,6 +352,7 @@ function addNotificationElement(notification, container, isFuture) {
 
 // Function to add a new notification
 function addNotification(notification) {
+    console.log("ADDING NOTIFICATION!!!!!!!");
     // Save the notification to localStorage
     let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
     notifications.push(notification);

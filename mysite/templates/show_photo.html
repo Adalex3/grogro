@@ -137,6 +137,33 @@
                             i++;
 
                             total += parseFloat(item.price.replace("$",""));
+
+                            // Add to notification center
+                            console.log("ADDING1");
+                            if(item.shelf_life != "N/A") {
+                                console.log("ADDING2");
+                                if(parseFloat(item.shelf_life) <= 30) {
+                                    console.log("ADDING3");
+                                    const date = new Date(); // Current date
+                                    const days = parseInt(item.shelf_life); // Assuming item.shelf_life is the number of days
+                                    if (!isNaN(days)) {
+                                        date.setDate(date.getDate() + days);
+                                    }
+                                    
+                                    const month = date.getMonth() + 1; // getMonth() returns 0-11, so we add 1
+                                    const day = date.getDate(); // getDate() returns the day of the month
+                                    const year = date.getFullYear();
+                                    
+                                    formatted_date = `${year}-${month}-${day}`; // Format the date as "MM/DD"
+                                    console.log("JERJEKLRDJKFLKF");
+                                    addNotification({
+                                        title: item.name + ' expiring' + (item.shelf_life < 15 ? (item.shelf_life < 5 ? (item.shelf_life <= 1 ? " today" : " very soon") : " soon") : ""),
+                                        subtitle: 'Your ' + item.name + " will expire on " + formatted_date,
+                                        date: formatted_date, // Future date
+                                        color: item.color, // Orange
+                                    });
+                                }
+                            }
                         
                     });
                     date = (() => { const now = new Date(); let hours = now.getHours(); return `${now.getMonth()+1}/${now.getDate()}/${now.getFullYear().toString().slice(-2)} ${hours % 12 || 12}:${now.getMinutes().toString().padStart(2, '0')}${hours >= 12 ? 'PM' : 'AM'}`; })();
@@ -150,6 +177,7 @@
                         dateLabel.style.opacity = 1;
                         totalLabel.style.opacity = 1;
                     },1000);
+
                 }
             })
             .catch(error => {
