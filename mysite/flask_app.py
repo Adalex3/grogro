@@ -25,8 +25,8 @@ def redirect_list():
 def receipt_scan():
     return render_template('receipt_scan.html')
 
-@app.route('/backend_tmp')
-def backend_tmp():
+@app.route('/list')
+def list():
     return render_template('backend_stuff/index.html')
 
 @app.route('/get_price_store', methods=['POST'])
