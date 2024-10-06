@@ -126,7 +126,7 @@ body {
 
 .hyper_button {
     width: 30%;
-    scale: 2;
+    scale: 1.5;
     background-color: var(--invis);
     border: 3px solid var(--dusk);
     color: var(--dusk);
