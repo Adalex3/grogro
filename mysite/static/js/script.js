@@ -11,10 +11,13 @@ function displayStoredFoodItems(searchTerm = '') {
     // Loop through localStorage and collect stored food items
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        const foodItem = JSON.parse(localStorage.getItem(key));
-
-        foodItems.push({ key, ...foodItem });
+        if (key.startsWith('food-')) {
+            const foodItem = JSON.parse(localStorage.getItem(key));
+            foodItems.push({ key, ...foodItem });
+        }
     }
+
+    console.log(foodItems);
 
     // Filter items based on the search term
     const filteredItems = foodItems.filter(item => item.food.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -47,21 +50,23 @@ function displayFoodNamesList() {
     // Loop through localStorage and collect stored food items
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        const foodItem = JSON.parse(localStorage.getItem(key));
+        if (key.startsWith('food-')) {
+            const foodItem = JSON.parse(localStorage.getItem(key));
 
-        // Create list item for food name only
-        const li = document.createElement('li');
-        li.textContent = foodItem.food; // Only display the food name
-        foodNamesUl.appendChild(li);
+            // Create list item for food name only
+            const li = document.createElement('li');
+            li.textContent = foodItem.food; // Only display the food name
+            foodNamesUl.appendChild(li);
 
-        // Create a row in the table for full details (hidden by default)
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${foodItem.food}</td>
-            <td>$${parseFloat(foodItem.price).toFixed(2)}</td>
-            <td>${foodItem.store}</td>
-        `;
-        foodDetailsTableBody.appendChild(tr);
+            // Create a row in the table for full details (hidden by default)
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${foodItem.food}</td>
+                <td>$${parseFloat(foodItem.price).toFixed(2)}</td>
+                <td>${foodItem.store}</td>
+            `;
+            foodDetailsTableBody.appendChild(tr);
+        }
     }
 }
 
@@ -166,7 +171,16 @@ document.getElementById('searchBar').addEventListener('input', function() {
 
 // Handle clear localStorage button
 document.getElementById('clearStorage').addEventListener('click', function() {
-    localStorage.clear(); // Clear all data from localStorage
+    // Collect keys to remove
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('food-')) {
+            keysToRemove.push(key);
+        }
+    }
+    // Remove the collected keys
+    keysToRemove.forEach(key => localStorage.removeItem(key));
     displayStoredFoodItems();  // Update the displayed data
     displayFoodNamesList();    // Update the food names list
 });
