@@ -121,22 +121,59 @@ document.getElementById('foodForm').addEventListener('submit', function(event) {
 
     // Get values from the form
     const food = document.getElementById('food').value;
-    const price = document.getElementById('price').value;
-    const store = document.getElementById('store').value || 'aldi';
+    let price = 0;
+    let store = 0;
 
-    // Create food object with the three key-value pairs
-    const foodItem = { food, price, store };
+    // Instead of grabbing price and store as user input, refer to data
+    fetch('/get_price_store', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ food:food })
+    }).then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
 
-    // Save the food object to localStorage (convert to string)
-    const key = `food-${food}-${Date.now()}`; // Unique key for each food item
-    localStorage.setItem(key, JSON.stringify(foodItem));
+        // Check if the status is 'success'
+        if (data.status === 'success') {
+            // Extracting price and store from the response
+            price = data.price; // Get the minimum price
+            store = data.store; // Get the store name
 
-    // Update the displayed stored food items
-    displayStoredFoodItems();
-    displayFoodNamesList(); // Update the food names list
+            // Log or display the minimum price and store name
+            console.log('Minimum Price:', price);
+            console.log('Store:', store);
 
-    // Reset the form
-    document.getElementById('foodForm').reset();
+
+            // Create food object with the three key-value pairs
+            const foodItem = { food, price, store };
+
+            // Save the food object to localStorage (convert to string)
+            const key = `food-${food}-${Date.now()}`; // Unique key for each food item
+            localStorage.setItem(key, JSON.stringify(foodItem));
+
+            // Update the displayed stored food items
+            displayStoredFoodItems();
+            displayFoodNamesList(); // Update the food names list
+
+            // Reset the form
+            document.getElementById('foodForm').reset();
+            
+            // Optionally alert the user with the details
+            // alert(`Grocery list submitted successfully!\nMinimum Price: ${minPrice}\nStore: ${storeName}`);
+        } else {
+            console.log('Food not added');
+        }
+
+
+
+
+    }).catch(error => {
+        console.error('Error:', error);
+    });
+
+    
 });
 
 // Handle Add to Favorites button

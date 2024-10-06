@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request, Response, jsonify
 from PIL import Image
 import pytesseract
 from io import BytesIO
@@ -29,10 +29,105 @@ def receipt_scan():
 def backend_tmp():
     return render_template('backend_stuff/index.html')
 
+@app.route('/get_price_store', methods=['POST'])
+def get_price_store():
+    data = request.get_json()
+    food = data.get('food', [])
+
+    return get_cheapest_store(food)
+
+# @app.route('/retrieve_cheapest', methods=['POST'])
+# def retrieve_cheapest():
+#     items = request.form.get('items') #instead of 'items', do whatever the name of the form is
+
 
 import cv2
 from openai import OpenAI
 import json
+import pandas as pd
+
+def aldiSearch(query):
+    # query paramter should be a string, potentially with spaces in between
+    import requests
+    from bs4 import BeautifulSoup
+
+    URL = "https://new.aldi.us/results?q="
+    q_values = query.split(' ')
+    for i in range(len(q_values)):
+        if (i != len(q_values) - 1):
+            URL = URL + q_values[i] + "+"
+        else:
+            URL = URL + q_values[i]
+
+    r = requests.get(URL)
+    # print(r.content)
+
+    soup = BeautifulSoup(r.content, 'html5lib')
+    # print(soup.prettify())
+
+    table = soup.find_all('div', attrs = {'class':'product-tile'})
+
+    aldi_products = []
+
+    for product in table:
+        # print(product.prettify())
+        product_dict = {}
+
+        product_dict['store'] = "Aldi"
+
+        name = product.find('div', attrs = {'class':'product-tile__name'})
+        # print(name.p.text)
+        product_dict['name'] = name.p.text
+
+        price = product.find('span', attrs = {'class':'base-price__regular'})
+        # print(price.span.text)
+        product_dict['price'] = price.span.text
+
+        aldi_products.append(product_dict)
+
+    return aldi_products[0]
+
+def get_cheapest_store(food_name):
+    #process data
+    df = pd.read_csv("static/res/GroceryData.csv")
+    
+    
+    row = df[df['Food Item'] == food_name]
+
+
+    if row.empty:
+        # In case the item is not already in the dataframe, do Aldi web-scraping:
+        web_scraped = aldiSearch(food_name)
+        store = web_scraped['store']
+        price = web_scraped['price'].replace('$', '')
+
+        return jsonify({'status': 'success', 'price': price, 'store': store})
+
+
+#     price = row['Aldi Price']
+#     store = 'Aldi'
+# 
+#     if (row['Walmart Price'] < price):
+#         price = row['Walmart Price']
+#         store = 'Walmart'
+#     if (row['Publix Price'] < price):
+#         price = row['Publix Price']
+#         store = 'Publix'
+
+    prices = {
+        'Aldi': row['Aldi Price'].values[0],
+        'Walmart': row['Walmart Price'].values[0],
+        'Publix': row['Publix Price'].values[0]
+    }
+    
+    # Finding the store with the minimum price
+    store = min(prices, key=prices.get)
+    min_price = prices[store]
+
+
+    return jsonify({'status': 'success', 'price': min_price, 'store': store})
+
+
 
 def extract_text(image_path):
     # Open the image file and encode it as a base64 string
