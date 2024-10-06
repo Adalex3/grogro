@@ -1,0 +1,27 @@
+/* Hide the table by default */
+/* Hi, Joanne and Alex! If you remove the comment from lines 3 - 5 the table will be hidden :) */
+/* #foodDetailsTable {
+    display: none;
+} */
+
+/* Basic styling for table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 8px;
+}
+
