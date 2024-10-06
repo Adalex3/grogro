@@ -6,12 +6,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/show_photo.css') }}">
     <title>Uploaded Receipt</title>
-    <style>
-        #loading {
-            font-size: 20px;
-            color: #555;
-        }
-    </style>
 </head>
 <body>
 
@@ -22,12 +16,30 @@
 
     <div class="container">
         <div class="receipt">
+            <div class="top-bar">
+                <a class="back-button" href="/receipt_scan"><div><img src="https://img.icons8.com/quill/100/reply-arrow.png" alt="reply-arrow"/></div></a>
+            </div>
+            <div class="spacer"></div>
             <img src="{{ url_for('static', filename=filename) }}" alt="Uploaded Receipt">
             <p id="uploaded">Uploaded at </p>
         </div>
         <div class="list">
             <h1>Your Groceries</h1>
-            <div id="loading">Analyzing receipt...</div>
+            <div class="loadParent">
+                <div id="load" style="display: flex; flex-direction: column; position: relative; justify-content: center; scale: 1.5;">
+                    <div style="align-self: center; transform: translateX(-15%)">
+                        <div id="loading">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <svg width="80" height="80" xmlns="http://www.w3.org/2000/svg" viewBox="50 50 100 50" style="position: absolute; top: -20px">
+                            <path d="M93 78C71 78 53 67 67 67 88 67 99 67 121 67 135 67 115 78 93 78" fill="var(--dusk)"/>
+                        </svg>
+                    </div>
+                    <p>Analyzing your receipt...</p>
+                </div>
+            </div>
             <p id="ocrText"></p>
             <div class="items">
                 <div class="item" id="item-template" style="display: none">
@@ -82,7 +94,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('loading').style.display = 'none';
+                document.getElementById('load').style.display = 'none';
 
                 // Process and display the extracted OCR data
                 const ocrTextElement = document.getElementById('ocrText');
@@ -139,7 +151,7 @@
                 }
             })
             .catch(error => {
-                document.getElementById('loading').innerHTML = "Failed to load OCR data. Error: " + error;
+                document.getElementById('load').innerHTML = "Failed to load OCR data. Error: " + error;
             });
         };
     </script>

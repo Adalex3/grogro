@@ -10,12 +10,34 @@
 </head>
 <body>
 
+    <div class="nav">
+        <img class="wave" src="../static/res/wave.svg">
+        <a href="/home"><img src="../static/res/title.png"></a>
+    </div>
+
     <div class="container">
 
-        <h1>Scan your receipt</h1>
+        <h1 style="margin: 0;">Let's see your receipt!</h1>
+        <p style="font-style: italic; color: var(--dusk); font-family: Arial, Helvetica, sans-serif; align-self: center; text-align: center; margin-top: 0; width: 100vw">We'll do the rest.</p>
+
+        <div class="loadParent">
+            <div id="load" style="display: flex; flex-direction: column; position: relative; justify-content: center; scale: 1.5;">
+                <div style="align-self: center; transform: translateX(-15%)">
+                    <div id="loading">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <svg width="80" height="80" xmlns="http://www.w3.org/2000/svg" viewBox="50 50 100 50" style="position: absolute; top: -20px">
+                        <path d="M93 78C71 78 53 67 67 67 88 67 99 67 121 67 135 67 115 78 93 78" fill="var(--dusk)"/>
+                    </svg>
+                </div>
+                <p style="color: var(--dusk); font-size: 0.8rem; margin-top: 25%; font-family: Arial, Helvetica, sans-serif">Powering up your webcam...</p>
+            </div>
+        </div>
 
         <!-- Video element to show the camera stream -->
-        <img id="video" class="center-alt" src="{{ url_for('video_feed') }}">
+        <img id="video" class="center-alt" src="{{ url_for('video_feed') }}" style="display: none">
         <img id="video-static" style="display: none" class="center-alt" src="">
         <button id="snap" class="button circle"><div></div></button>
 
@@ -42,6 +64,16 @@
         const uploadForm = document.getElementById('uploadForm');
         const imageDataInput = document.getElementById('imageData');
 
+        // Event listener for when the video feed is loaded
+        video.addEventListener('load', () => {
+            console.log("Video feed has loaded");
+            // You can add any other code you want to execute here
+            // For example, hide loading animation or make the snap button active
+            video.style.display = 'block';
+            document.getElementById('load').style.display = 'none'; // Hide loading animation
+            snap.disabled = false; // Enable the snapshot button
+        });
+
         // Capture the photo
         snap.addEventListener("click", () => {
             const context = canvas.getContext('2d');
@@ -52,6 +84,8 @@
             // Hide video and show canvas
             video.style.display = 'none';
             canvas.style.display = 'block';
+
+            snap.classList.toggle("active",true);
 
             // Convert the photo to a base64 string
             const imageData = canvas.toDataURL('image/png');
