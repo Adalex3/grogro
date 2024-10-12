@@ -13,25 +13,25 @@
         <label for="food">Food:</label>
         <input type="text" id="food" required>
 
-        <label for="price">Price:</label>
+        <!-- <label for="price">Price:</label>
         <input type="number" id="price" step="0.01" required>
 
         <label for="store">Store:</label>
-        <input type="text" id="store">
+        <input type="text" id="store"> -->
 
         <button type="submit" id="saveToStorage">Save to LocalStorage</button>
         <button type="button" id="addToFavorites">Add to Favorites</button>
     </form>
 
-    <h2>Stored Food Items</h2>
-    <input type="text" id="searchBar" placeholder="Search food...">
-    <ul id="foodItems"></ul>
+    <h2 style="display:none">Stored Food Items</h2>
+    <!-- <input type="text" id="searchBar" placeholder="Search food..."> -->
+    <ul style="display:none" id="foodItems"></ul>
 
-    <h2>Favorites</h2>
-    <ul id="favoritesList"></ul>
+    <h2 style="display:none">Favorites</h2>
+    <ul style="display:none" id="favoritesList"></ul>
 
-    <h2>List (Food Names)</h2>
-    <ul id="foodNamesList"></ul>  <!-- List to display food names only -->
+    <h2 style="display:none">List (Food Names)</h2>
+    <ul style="display:none" id="foodNamesList"></ul>  <!-- List to display food names only -->
 
     <h2>Full Food Details (Hidden Table)</h2>
     <table id="foodDetailsTable">
