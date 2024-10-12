@@ -25,9 +25,9 @@ def redirect_list():
 def receipt_scan():
     return render_template('receipt_scan.html')
 
-@app.route('/backend_tmp')
-def backend_tmp():
-    return render_template('backend_stuff/index.html')
+@app.route('/list')
+def list():
+    return render_template('list.html')
 
 
 import cv2
@@ -42,7 +42,7 @@ def extract_text(image_path):
 
     base64_image = encode_image(image_path)
 
-    client = OpenAI(api_key='goodbye')
+    client = OpenAI(api_key='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')
 
     response = client.chat.completions.create(
         model='gpt-4o',
@@ -158,7 +158,7 @@ The output should be structured in JSON format as follows:
 
 def adjust_receipt_image(image, debug=False):
     # Convert to HSV color space to filter out non-white regions
-    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV),
 
     # Define a mask for white regions (low saturation, high value)
     lower_white = np.array([0, 0, 150])  # Adjust the range based on lighting conditions

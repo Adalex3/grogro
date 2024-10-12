@@ -3,8 +3,6 @@ let favorites = [];
 
 // Function to display stored food items from localStorage
 function displayStoredFoodItems(searchTerm = '') {
-    const foodItemsUl = document.getElementById('foodItems');
-    foodItemsUl.innerHTML = ''; // Clear the previous display
 
     const foodItems = [];
 
@@ -23,26 +21,16 @@ function displayStoredFoodItems(searchTerm = '') {
     const filteredItems = foodItems.filter(item => item.food.toLowerCase().includes(searchTerm.toLowerCase()));
 
     if (filteredItems.length === 0) {
-        foodItemsUl.innerHTML = '<li>No food items stored.</li>';
+        document.querySelector("#nothing-stored").style.display = 'block';
         return;
     }
-
-    // Create list items for each food
-    filteredItems.forEach(item => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <strong>Food:</strong> ${item.food} | 
-            <strong>Price:</strong> $${parseFloat(item.price).toFixed(2)} | 
-            <strong>Store:</strong> ${item.store}
-        `;
-        foodItemsUl.appendChild(li);
-    });
 }
 
-// Function to display food names only (List)
+// Function to display food names only (List) using the template
 function displayFoodNamesList() {
     const foodNamesUl = document.getElementById('foodNamesList');
     const foodDetailsTableBody = document.querySelector('#foodDetailsTable tbody');
+    const itemTemplate = document.getElementById('item-template');
 
     foodNamesUl.innerHTML = ''; // Clear the previous list
     foodDetailsTableBody.innerHTML = ''; // Clear previous table rows
@@ -53,10 +41,14 @@ function displayFoodNamesList() {
         if (key.startsWith('food-')) {
             const foodItem = JSON.parse(localStorage.getItem(key));
 
-            // Create list item for food name only
-            const li = document.createElement('li');
-            li.textContent = foodItem.food; // Only display the food name
-            foodNamesUl.appendChild(li);
+            // Clone the template for each food item
+            const clonedItem = itemTemplate.cloneNode(true);
+            clonedItem.style.display = 'flex'; // Make sure the cloned item is visible
+            clonedItem.querySelector('.name').textContent = foodItem.food; // Set the food name
+            clonedItem.querySelector('.price').textContent = `$${parseFloat(foodItem.price).toFixed(2)}`; // Set the price
+            clonedItem.querySelector('.favorite').addEventListener('click', () => addToList(foodItem.food)); // Add to list functionality
+
+            foodNamesUl.appendChild(clonedItem);
 
             // Create a row in the table for full details (hidden by default)
             const tr = document.createElement('tr');
@@ -121,8 +113,8 @@ document.getElementById('foodForm').addEventListener('submit', function(event) {
 
     // Get values from the form
     const food = document.getElementById('food').value;
-    const price = document.getElementById('price').value;
-    const store = document.getElementById('store').value || 'aldi';
+    const price = 0;
+    const store = 'aldi';
 
     // Create food object with the three key-value pairs
     const foodItem = { food, price, store };
@@ -161,12 +153,6 @@ document.getElementById('addToFavorites').addEventListener('click', function() {
 
     // Reset the form
     document.getElementById('foodForm').reset();
-});
-
-// Handle search input
-document.getElementById('searchBar').addEventListener('input', function() {
-    const searchTerm = document.getElementById('searchBar').value;
-    displayStoredFoodItems(searchTerm); // Display items filtered by search term
 });
 
 // Handle clear localStorage button
