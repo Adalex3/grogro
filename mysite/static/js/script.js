@@ -28,7 +28,7 @@ function displayStoredFoodItems(searchTerm = '') {
 
 // Function to display food names only (List) using the template
 function displayFoodNamesList() {
-    const foodNamesUl = document.getElementById('foodNamesList');
+    const foodNamesUl = document.getElementById('other');
     const foodDetailsTableBody = document.querySelector('#foodDetailsTable tbody');
     const itemTemplate = document.getElementById('item-template');
 
@@ -93,7 +93,7 @@ function displayFavorites() {
 
 // Function to add a food name to the "List" list without duplicates
 function addToList(foodName) {
-    const listOfFoodNames = document.getElementById('foodNamesList');
+    const listOfFoodNames = document.getElementById('other');
     
     // Check if the food name is already in the list
     const isFoodInList = Array.from(listOfFoodNames.children).some(li => li.textContent === foodName);
@@ -110,6 +110,9 @@ function addToList(foodName) {
 // Handle form submission to store food object in localStorage
 document.getElementById('foodForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent form from refreshing the page
+
+    const temp = document.getElementById('foodForm');
+    temp.classList.add('smooth');
 
     // Get values from the form
     const food = document.getElementById('food').value;

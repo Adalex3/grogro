@@ -10,20 +10,56 @@
 .container {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.grid {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 25px;
+    margin: 0 auto;
+    margin-top: 15vh;
+}
+.grid ul {
+    width: 25vw;
+    height: 25vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+.grid div div { 
+    display: flex;
     justify-content: center;
 }
 
 form {
     font-family: Nunito, system-ui, sans-serif;
-    width: 100%;
+    width: 50vw;
+    position: absolute;
+    top: 20vh;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     gap: 2%;
 }
+form div {
+    display: flex;
+    flex-direction: row;
+}
+form h3 {
+    margin: 15px 0;
+}
 
 input {
+    height: auto;
+    border: 3px solid var(--dusk);
     min-width: 30vw;
+    pointer-events: none;
+    z-index: 2;
+    cursor: pointer;
 }
 
 
@@ -106,6 +142,12 @@ h2 {
     color: var(--dusk);
 }
 
+h3 {
+    font-family: Nunito, system-ui, sans-serif;
+    color: var(--dusk);
+    font-size: 1.3rem;
+}
+
 #clearStorage {
     background-color: var(--dusk);
     padding: 1%;
@@ -128,4 +170,14 @@ h2 {
 #clearStorage:active {
     scale: 90%;
     transition: 0.25s;
+}
+
+.smooth {
+    animation: smooth 0.2s ease;
+}
+
+@keyframes smooth {
+    0%, 100% {
+        transform: translateY(20vh);
+    }
 }

@@ -13,25 +13,51 @@
     <script src="{{ url_for('static', filename='js/notification_center.js') }}"></script>
 
     <div class="nav">
-        <img class="wave" src="../static/res/wave.svg">
+        <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.2 1 0.2965">
+            <path d="M1 0Q.829-.114.435.031T0 0L0-.2 1-.2" fill="#b5d43c"/>
+        </svg>
         <a href="/"><img src="../static/res/title.png"></a>
     </div>
 
     <div class="container">
         
         <form id="foodForm">
-            <label for="food">Food:</label>
-            <input type="text" id="food" required>
-    
-            <button type="submit" id="saveToStorage">Add</button>
+            <h3 for="food">What would you like to add to your list?</h3>
+            
+            <div>
+                <input type="text" id="food" required>
+                <button type="submit" id="saveToStorage">+</button>
+            </div>
         </form>
     
-        <h2>Favorites</h2>
-        <ul id="favoritesList"></ul>
-    
-        <h2>List (Food Names)</h2>
-        <ul id="foodNamesList"></ul>  <!-- List to display food names only -->
-    
+        <div class="grid" style="display: none;">
+            <div>
+                <div><h2>Produce</h2></div>
+                <ul id="produce"></ul>
+            </div>
+            <div>
+                <div><h2>Grains</h2></div>
+                <ul id="grains"></ul>
+            </div>
+            <div>
+                <div><h2>Meat & Seafood</h2></div>
+                <ul id="meatSeafoodr"></ul>
+            </div>
+            <div>
+                <div><h2>Dairy</h2></div>
+                <ul id="dairy"></ul>
+            </div>
+            <div>
+                <div><h2>Beverages</h2></div>
+                <ul id="beverages"></ul>
+            </div>
+            <div>
+                <div><h2>Other</h2></div>
+                <ul id="other"></ul>
+            </div>
+             <!-- Produce, Grains, Meat & Seafood, Dairy, Beverages, Other -->
+        </div>
+        <button id="clearStorage" style="display: none;">Clear</button>
     
         <div class="main-list">
             <p id="nothing-stored" style="display:none">No food items stored.</p>
@@ -62,8 +88,6 @@
                 <tbody></tbody>
             </table>
         </div>
-    
-        <button id="clearStorage">Clear</button>
 
     </div>
 
