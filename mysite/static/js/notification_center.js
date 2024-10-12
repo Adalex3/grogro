@@ -9,77 +9,121 @@ const style = document.createElement("style");
 document.body.appendChild(style);
 style.textContent = `
 /* Existing CSS styles */
-.corner-button {
+.bottom-banner {
     position: fixed;
-    top: 100px;
-    right: 50px;
-    width: 75px;
-    height: 75px;
-    background-color: white;
-    border-radius: 30px;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
-    z-index: 10000;
-    cursor: pointer;
-    transition: 0.25s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.corner-button:hover {
-    transform: scale(1.1);
-}
-
-.corner-button:active {
-    transform: scale(0.9);
-}
-
-.corner-button img {
-    width: 50%;
-    height: 50%;
-    transform: translateY(-5%);
-}
-
-.corner-button p {
-    border-radius: 20px;
-    padding: 2% 10%;
-    background-color: red;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80vw;
+    min-width: 300px;
+    max-width: 800px;
+    background-color: var(--dark3);
     color: white;
-    position: absolute;
+    text-align: center;
+    padding: 1% 5%;
+    z-index: 10000;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0px -2px 5px rgba(0,0,0,0.3);
+    font-family: Nunito, system-ui, sans-serif;
+    display: flex;
+    flex-direction: row;
+    transition: 0.5s;
+}
+
+.bottom-banner p:not(.notification-dot) {
+    width: min(600px, 60vw);
+    text-align: left;
+    transition: 1s;
+    font-size: 1.1rem
+}
+
+.bottom-banner button {
+    background-color: white;
+    color: var(--dark3);
+    border: none;
+    padding: 10px 20px;
     font-size: 1rem;
-    transform: translate(100%, 100%);
+    cursor: pointer;
+    border-radius: 5px;
+    margin-left: 10px;
+    font-weight: 900;
+    font-family: Nunito, system-ui, sans-serif;
+    min-width: 8rem;
+    transition: 1s;
+}
+
+.bottom-banner button:hover {
+    scale: 110%;
+    transition: 0.25s;
+}
+.bottom-banner button:active {
+    scale: 90%;    
+    transition: 0.25s;
 }
 
 .notification-center {
     font-family: Nunito, system-ui, sans-serif;
     position: fixed;
-    top: 0;
-    right: -300px;
-    width: 300px;
-    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(60%);
+    width: 80vw;
+    max-width: 600px;
+    height: auto;
+    max-height: 80vh;
     background-color: white;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
     z-index: 9999;
-    transition: right 0.3s ease-in-out;
+    overflow: auto;
+    padding: 20px;
+    opacity: 0;
+    transition: 0.1s ease-in-out;
+    border-radius: 15px;
 }
 
 .notification-center.active {
-    right: 0;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(100%);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5); /* Semi-transparent background */
+    z-index: 9998;
+    opacity: 0;
+    transition: 0.2s ease-in-out;
+}
+
+.modal-overlay.active {
+    opacity: 1;
 }
 
 .notification-center .close-button {
     position: absolute;
     top: 10px;
-    left: 10px;
+    right: 20px;
     font-size: 1.5rem;
     cursor: pointer;
 }
 
 .notification-center .notifications {
-    margin-top: 50px;
     padding: 10px;
     overflow-y: auto;
-    max-height: calc(100% - 100px); /* Adjusted for clear all button */
+    max-height: calc(80vh - 100px); /* Adjusted for clear all button */
+}
+
+.notification-dot {
+    animation: dot 2s infinite ease-in-out;
+    margin-right: 1%;
+}
+
+@keyframes dot {
+    from, to {opacity: 1}
+    50% {opacity: 0}
 }
 
 .notification {
@@ -117,12 +161,24 @@ style.textContent = `
 .clear-all-button {
     position: absolute;
     bottom: 10px;
-    left: 10px;
+    right: 10px;
     font-size: 1rem;
     cursor: pointer;
-    color: red;
-    background-color: white;
-    padding: 5%;
+    color: white;
+    font-family: Nunito, system-ui, sans-serif;
+    background-color: var(--dusk);
+    padding: 1%;
+    transition: 1s;
+}
+
+.clear-all-button:hover, .clear-all-button:active {
+    transition: 0.25s;
+}
+.clear-all-button:hover {
+    scale: 110%;
+}
+.clear-all-button:active {
+    scale: 90%;
 }
 
 .countdown {
@@ -137,19 +193,28 @@ style.textContent = `
 }
 `;
 
-const cornerButton = document.createElement("div");
-cornerButton.classList.add("corner-button");
-document.body.appendChild(cornerButton);
+// Create the bottom banner
+const bottomBanner = document.createElement('div');
+bottomBanner.classList.add('bottom-banner');
 
-const cornerButtonImg = document.createElement("img");
-cornerButton.appendChild(cornerButtonImg);
-cornerButtonImg.src = "../static/res/alarm.png";
+const notificationDot = document.createElement("p");
+notificationDot.classList.add('notification-dot');
+notificationDot.textContent = "•";
+bottomBanner.appendChild(notificationDot);
 
-const cornerButtonBadge = document.createElement("p");
-cornerButtonBadge.textContent = "•";
-cornerButton.appendChild(cornerButtonBadge);
+const notificationText = document.createElement('p');
+notificationText.classList.add('notification-text');
+bottomBanner.appendChild(notificationText);
 
-cornerButton.addEventListener('click', function(event){
+// Create the "See more" button
+const seeMoreButton = document.createElement('button');
+seeMoreButton.textContent = 'See more';
+bottomBanner.appendChild(seeMoreButton);
+
+document.body.appendChild(bottomBanner);
+
+// Event listener for the "See more" button
+seeMoreButton.addEventListener('click', function(event) {
     event.stopPropagation();
     showCenter();
 });
@@ -169,36 +234,34 @@ const notificationsContainer = document.createElement('div');
 notificationsContainer.classList.add('notifications');
 notificationCenter.appendChild(notificationsContainer);
 
-// Append the notification center to the body
+// Create the modal overlay
+const modalOverlay = document.createElement('div');
+modalOverlay.classList.add('modal-overlay');
+
+// Append the notification center and overlay to the body
+document.body.appendChild(modalOverlay);
 document.body.appendChild(notificationCenter);
 
 // Event listener for the close button
 closeButton.addEventListener('click', hideCenter);
 
-// Prevent clicks inside the notification center from closing it
-notificationCenter.addEventListener('click', function(event) {
-    event.stopPropagation();
-});
+// Event listener for clicking on the overlay to close the modal
+modalOverlay.addEventListener('click', hideCenter);
 
 // Function to show the notification center
 function showCenter() {
-    cornerButton.style.opacity = 0;
+    bottomBanner.style.opacity = 0;
     notificationCenter.classList.add('active');
-    document.addEventListener('click', outsideClickListener);
+    modalOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
 }
 
 // Function to hide the notification center
 function hideCenter() {
-    cornerButton.style.opacity = 1;
+    bottomBanner.style.opacity = 1;
     notificationCenter.classList.remove('active');
-    document.removeEventListener('click', outsideClickListener);
-}
-
-// Function to detect clicks outside the notification center
-function outsideClickListener(event) {
-    if (!notificationCenter.contains(event.target) && !cornerButton.contains(event.target)) {
-        hideCenter();
-    }
+    modalOverlay.classList.remove('active');
+    document.body.style.overflow = ''; // Restore background scrolling
 }
 
 // Function to get time remaining for countdown
@@ -352,7 +415,6 @@ function addNotificationElement(notification, container, isFuture) {
 
 // Function to add a new notification
 function addNotification(notification) {
-    console.log("ADDING NOTIFICATION!!!!!!!");
     // Save the notification to localStorage
     let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
     notifications.push(notification);
@@ -373,11 +435,11 @@ function updateBadge() {
         return notificationDate >= today;
     });
     if (futureNotifications.length > 0) {
-        cornerButtonBadge.textContent = futureNotifications.length;
-        cornerButtonBadge.style.padding = '';
+        // Show the bottom banner
+        // bottomBanner.style.opacity = 1;
     } else {
-        cornerButtonBadge.textContent = '';
-        cornerButtonBadge.style.padding = '0';
+        // Hide the bottom banner
+        // bottomBanner.style.opacity = 0;
     }
 }
 
@@ -403,3 +465,74 @@ clearAllButton.addEventListener('click', function() {
     notificationsContainer.innerHTML = '';
     updateBadge();
 });
+
+// Update the bottom banner text
+let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const futureNotifications = notifications.filter(notification => {
+    const notificationDate = new Date(notification.date);
+    notificationDate.setHours(0, 0, 0, 0);
+    return notificationDate >= today;
+});
+
+// Sort notifications by date
+futureNotifications.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+if (futureNotifications.length <= 0) {
+    notificationText.textContent = "No upcoming notifications.";
+} else {
+    const nearestNotif = futureNotifications[0];
+    const nearestNotifDate = new Date(nearestNotif.date);
+    nearestNotifDate.setHours(0, 0, 0, 0);
+
+    // Calculate time remaining between today and nearest notification
+    const timeDiff = nearestNotifDate - today;
+    const threshold = timeDiff * 1.5;  // 150% of time difference
+
+    var shownNotifications = [];
+
+    futureNotifications.forEach(function(notif) {
+        const notifDate = new Date(notif.date);
+        notifDate.setHours(0, 0, 0, 0);
+        
+        // Check if the notification is within 150% of the time difference
+        if (notifDate - today <= threshold) {
+            shownNotifications.push(notif);
+        }
+    });
+
+    if (shownNotifications.length > 0) {
+        let currentIndex = 0;
+        
+        // Function to update notification text content
+        function updateNotificationText() {
+            const currentNotif = shownNotifications[currentIndex];
+            const timeRemaining = getTimeRemaining(currentNotif.date);
+            notificationText.textContent = 'IN ' + timeRemaining.toUpperCase() + ": " + currentNotif.title;
+
+            // Increment index and reset if at the end of the list
+            currentIndex = (currentIndex + 1) % shownNotifications.length;
+
+            notificationText.style.transform = 'translateY(-100%)';
+            notificationText.style.opacity = '0';
+
+            setTimeout(function(){
+                notificationText.style.transform = 'translateY(0%)';
+                notificationText.style.opacity = '1';
+            },1000);
+
+            setTimeout(function(){
+                notificationText.style.transform = 'translateY(100%)';
+                notificationText.style.opacity = '0';
+            },3500);
+        }
+
+        // Start rotating text content every 5 seconds
+        updateNotificationText(); // Initial call
+        setInterval(updateNotificationText, 5000); // Rotates every 5 seconds
+    } else {
+        notificationText.textContent = 'IN ' + getTimeRemaining(nearestNotif.date).toUpperCase() + ": " + nearestNotif.title;
+    }
+}
