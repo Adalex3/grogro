@@ -59,8 +59,8 @@ body {
 .nav .wave {
     object-fit: cover;
     overflow: visible;
-    transform: translateY(-40%) scaleY(50%);
-    z-index: 1;
+    z-index: 0;
+    height: min(15vw, 20vh);
 }
 
 .nav a {
@@ -68,17 +68,17 @@ body {
     font-weight: 900;
     position: absolute;
     z-index: 1000;
-    left: 10%;
-    top: 5%;
+    left: 7.5%;
+    top: 2.5%;
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 .nav a img {
-    width: 25%;
+    width: 100%;
 }
 
-input {
-    height: auto;
-    border: 3px solid var(--dusk);
-}
 #saveToStorage {
     font-family: Nunito, system-ui, sans-serif;
     color: var(--dusk);

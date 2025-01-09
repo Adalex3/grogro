@@ -57,7 +57,7 @@ input {
     height: auto;
     border: 3px solid var(--dusk);
     min-width: 30vw;
-    pointer-events: none;
+    /* pointer-events: none; */
     z-index: 2;
     cursor: pointer;
 }

@@ -62,6 +62,7 @@ style.textContent = `
 }
 
 .notification-center {
+    pointer-events: none;
     font-family: Nunito, system-ui, sans-serif;
     position: fixed;
     top: 50%;
@@ -87,6 +88,7 @@ style.textContent = `
 }
 
 .modal-overlay {
+    pointer-events: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -252,6 +254,7 @@ modalOverlay.addEventListener('click', hideCenter);
 function showCenter() {
     bottomBanner.style.opacity = 0;
     notificationCenter.classList.add('active');
+    notificationCenter.style.pointerEvents = 'auto';
     modalOverlay.classList.add('active');
     document.body.style.overflow = 'hidden'; // Prevent background scrolling
 }
@@ -260,6 +263,7 @@ function showCenter() {
 function hideCenter() {
     bottomBanner.style.opacity = 1;
     notificationCenter.classList.remove('active');
+    notificationCenter.style.pointerEvents = 'none';
     modalOverlay.classList.remove('active');
     document.body.style.overflow = ''; // Restore background scrolling
 }
